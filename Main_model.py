@@ -18,7 +18,7 @@ try:
         no2=float(input("Enter the quantity of Nitrogen Dioxide (NO2) in ug/m^3: "))
         so2=float(input("Enter Sulphur Dioxde (SO2) in in ug/m^3: "))
         co=float(input("Enter Carbon Monoxide (CO) in in ug/m^3: "))
-        ozone=float(input("Enter quantity of Ozone in ug/m^3: "))
+        ozone=float(input("Enter quantity of Ozone (O3) in ug/m^3: "))
 
 except ValueError:
     print("Exception occured: Value Error")
