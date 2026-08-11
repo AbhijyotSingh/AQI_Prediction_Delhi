@@ -16,8 +16,8 @@ try:
         pm2_5=float(input("Enter Particulate Matter < 2.5 micrometers in ug/m^3: "))
         pm10=float(input("Enter Particulate Matter < 10 micrometers in ug/m^3: "))
         no2=float(input("Enter the quantity of Nitrogen Dioxide (NO2) in ug/m^3: "))
-        so2=float(input("Enter Sulphur Dioxde in in ug/m^3: "))
-        co=float(input("Enter Carbon Monoxide in in ug/m^3: "))
+        so2=float(input("Enter Sulphur Dioxde (SO2) in in ug/m^3: "))
+        co=float(input("Enter Carbon Monoxide (CO) in in ug/m^3: "))
         ozone=float(input("Enter quantity of Ozone in ug/m^3: "))
 
 except ValueError:
