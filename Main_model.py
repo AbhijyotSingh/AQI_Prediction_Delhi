@@ -1,30 +1,34 @@
 import pickle as pk
 import numpy as np
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
-#Loading the model
-
-with open(r"Projects\AQI - Regression\Random_Forest.pk","rb") as file:
+with open(r"C:\Users\Abhijyot Singh Roda\Desktop\Coding Stuff\Python\Projects\Not so random projects\ML Projects\Projects\AQI - Regression\Random_Forest.pk","rb") as file:
     model=pk.load(file)
     
-try:
-    month=int(input("Enter month in integer: "))
-    if month<1 or month>12:
-        print("Please enter month between 1-12")
-        exit()
-    else:
-        year=int(input("Enter year: "))
-        pm2_5=float(input("Enter Particulate Matter < 2.5 micrometers in ug/m^3: "))
-        pm10=float(input("Enter Particulate Matter < 10 micrometers in ug/m^3: "))
-        no2=float(input("Enter the quantity of Nitrogen Dioxide (NO2) in ug/m^3: "))
-        so2=float(input("Enter Sulphur Dioxde (SO2) in in ug/m^3: "))
-        co=float(input("Enter Carbon Monoxide (CO) in in ug/m^3: "))
-        ozone=float(input("Enter quantity of Ozone (O3) in ug/m^3: "))
-
-except ValueError:
-    print("Exception occured: Value Error")
-    exit()
-
-else:
+def predict(month,year,pm2_5,pm10,no2,so2,co,ozone):   
     data=np.array([[month,year,pm2_5,pm10,no2,so2,co,ozone]])
     predicted_aqi=model.predict(data)
-    print("Predicted AQI for the given data is:",predicted_aqi[0])
+    return predicted_aqi[0]
+
+app=Flask(__name__)
+CORS(app)
+
+@app.route("/predict", methods=["POST"])
+def predict_route():
+    input_data=request.get_json()
+    month=input_data["month"]
+    year=input_data["year"]
+    pm2_5=input_data["pm2_5"]
+    pm10=input_data["pm10"]
+    no2=input_data["no2"]
+    so2=input_data["so2"]
+    co=input_data["co"]
+    ozone=input_data["ozone"]
+    
+    result=predict(month,year,pm2_5,pm10,no2,so2,co,ozone)
+    
+    return jsonify({"Predicted_AQI":float(result)})
+
+if __name__=="__main__":
+    app.run(debug=True)
