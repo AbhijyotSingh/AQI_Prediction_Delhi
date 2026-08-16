@@ -46,7 +46,7 @@
             const so2 = document.getElementById("so2").value;
             const co = document.getElementById("co").value;
             const ozone = document.getElementById("ozone").value;
-            fetch("http://127.0.0.1:5000/predict",{
+            fetch("https://aqi-prediction-delhi.onrender.com",{
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body: JSON.stringify({
