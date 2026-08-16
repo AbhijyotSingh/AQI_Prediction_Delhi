@@ -21,14 +21,14 @@ CORS(app)
 @app.route("/predict", methods=["POST"])
 def predict_route():
     input_data=request.get_json()
-    month=input_data["month"]
-    year=input_data["year"]
-    pm2_5=input_data["pm2_5"]
-    pm10=input_data["pm10"]
-    no2=input_data["no2"]
-    so2=input_data["so2"]
-    co=input_data["co"]
-    ozone=input_data["ozone"]
+    month=float(input_data["month"])
+    year=float(input_data["year"])
+    pm2_5=float(input_data["pm2_5"])
+    pm10=float(input_data["pm10"])
+    no2=float(input_data["no2"])
+    so2=float(input_data["so2"])
+    co=float(input_data["co"])
+    ozone=float(input_data["ozone"])
     
     result=predict(month,year,pm2_5,pm10,no2,so2,co,ozone)
     
