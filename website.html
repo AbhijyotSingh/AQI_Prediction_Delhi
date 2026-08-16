@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            AQI Predictor
+        </title>
+    </head>
+    <body>
+        <h1> AQI Predictor</h1>
+        <form id="aqiForm">
+            <label for="month">Enter month:</label>
+            <input type="number" id="month" placeholder="1-12">
+            <br>
+            <label for="year">Enter year:</label>
+            <input type="number" id="year">
+            <br>
+            <label for="pm2_5">Enter particulate matter less than 2.5 micrometers:</label>
+            <input type="number" id="pm2_5" step="any">
+            <br>
+            <label for="pm10">Enter particulate matter less than 10 micrometers:</label>
+            <input type="number" id="pm10" step="any">
+            <br>
+            <label for="no2">Enter the quantity of NO2:</label>
+            <input type="number" id="no2" step="any">
+            <br>
+            <label for="so2">Enter the quantity of SO2:</label>
+            <input type="number" id="so2" step="any">
+            <br>
+            <label for="co">Enter the quantity of Carbon Monoxide:</label>
+            <input type="number" id="co" step="any">
+            <br>
+            <label for="ozone">Enter the quantity of grounded Ozone:</label>
+            <input type="number" id="ozone" step="any">
+            <br>
+            <button type="submit">Predict AQI</button>
+        </form>
+        <div id="result"></div>
+    <script>
+        document.getElementById("aqiForm").addEventListener("submit",function(event){
+            event.preventDefault();
+            const month = document.getElementById("month").value;
+            const year = document.getElementById("year").value;
+            const pm2_5 = document.getElementById("pm2_5").value;
+            const pm10 = document.getElementById("pm10").value;
+            const no2 = document.getElementById("no2").value;
+            const so2 = document.getElementById("so2").value;
+            const co = document.getElementById("co").value;
+            const ozone = document.getElementById("ozone").value;
+            fetch("http://127.0.0.1:5000/predict",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({
+                        month: month,
+                        year: year,
+                        pm2_5: pm2_5,
+                        pm10: pm10,
+                        no2: no2,
+                        so2: so2,
+                        co: co,
+                        ozone: ozone
+                    })
+                })
+                .then(response=>response.json())
+                .then(data => {
+                document.getElementById("result").innerText = "Predicted AQI: " + data.Predicted_AQI;
+            })
+            .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("result").innerText = "Something went wrong.";
+            });
+        });
+    </script>
+    </body>
+</html>
