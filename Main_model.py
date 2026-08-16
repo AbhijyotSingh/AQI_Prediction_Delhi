@@ -6,13 +6,18 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(BASE_DIR, "Random_Forest.pk")
+scaler_path=os.path.join(BASE_DIR,"scaler.pk")
 
 with open(model_path,"rb") as file:
     model=pk.load(file)
+
+with open(scaler_path,"rb") as file:
+    scaler=pk.load(file)
     
 def predict(month,year,pm2_5,pm10,no2,so2,co,ozone):   
     data=np.array([[month,year,pm2_5,pm10,no2,so2,co,ozone]])
-    predicted_aqi=model.predict(data)
+    data_scaled=scaler.transform(data)
+    predicted_aqi=model.predict(data_scaled)
     return predicted_aqi[0]
 
 app=Flask(__name__)
