@@ -4,9 +4,11 @@
         <title>
             AQI Predictor
         </title>
+        <link rel="stylesheet" href="css.css">
     </head>
     <body>
-        <h1> AQI Predictor</h1>
+        <h1>AQI Predictor</h1>
+        <h2>Predicting AQI through years of data</h2>
         <form id="aqiForm">
             <label for="month">Enter month:</label>
             <input type="number" id="month" placeholder="1-12">
@@ -14,22 +16,22 @@
             <label for="year">Enter year:</label>
             <input type="number" id="year">
             <br>
-            <label for="pm2_5">Enter particulate matter less than 2.5 micrometers:</label>
+            <label for="pm2_5">Enter particulate matter less than 2.5 micrometers (PM<sub>2.5</sub>):</label>
             <input type="number" id="pm2_5" step="any">
             <br>
-            <label for="pm10">Enter particulate matter less than 10 micrometers:</label>
+            <label for="pm10">Enter particulate matter less than 10 micrometers (PM<sub>10</sub>):</label>
             <input type="number" id="pm10" step="any">
             <br>
-            <label for="no2">Enter the quantity of NO2:</label>
+            <label for="no2">Enter the quantity of Nitrogen Dioxide (NO<sub></sub>2):</label>
             <input type="number" id="no2" step="any">
             <br>
-            <label for="so2">Enter the quantity of SO2:</label>
+            <label for="so2">Enter the quantity of Sulphur Dioxide (SO<sub></sub>2):</label>
             <input type="number" id="so2" step="any">
             <br>
-            <label for="co">Enter the quantity of Carbon Monoxide:</label>
+            <label for="co">Enter the quantity of Carbon Monoxide (CO):</label>
             <input type="number" id="co" step="any">
             <br>
-            <label for="ozone">Enter the quantity of grounded Ozone:</label>
+            <label for="ozone">Enter the quantity of grounded Ozone (O<sub>3</sub>):</label>
             <input type="number" id="ozone" step="any">
             <br>
             <button type="submit">Predict AQI</button>
