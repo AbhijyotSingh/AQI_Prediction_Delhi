@@ -1,0 +1,29 @@
+body{
+    background-color:azure ;
+}
+
+h1{
+    color:darkblue;
+    font-family: arial;
+    text-align: center;
+}
+
+h2{
+    color:black;
+    font-family: arial;
+    text-align: center;
+}
+
+label{
+    color:black;
+    font-family: verdana;
+}
+
+div{
+    color:black;
+    font-family: arial;
+}
+
+button{
+    color:darkblue;
+}
