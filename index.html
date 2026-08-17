@@ -36,39 +36,54 @@
         </form>
         <div id="result"></div>
     <script>
-        document.getElementById("aqiForm").addEventListener("submit",function(event){
-            event.preventDefault();
-            const month = document.getElementById("month").value;
-            const year = document.getElementById("year").value;
-            const pm2_5 = document.getElementById("pm2_5").value;
-            const pm10 = document.getElementById("pm10").value;
-            const no2 = document.getElementById("no2").value;
-            const so2 = document.getElementById("so2").value;
-            const co = document.getElementById("co").value;
-            const ozone = document.getElementById("ozone").value;
-            fetch("https://aqi-prediction-delhi.onrender.com/predict",{
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body: JSON.stringify({
-                        month: month,
-                        year: year,
-                        pm2_5: pm2_5,
-                        pm10: pm10,
-                        no2: no2,
-                        so2: so2,
-                        co: co,
-                        ozone: ozone
-                    })
-                })
-                .then(response=>response.json())
-                .then(data => {
-                document.getElementById("result").innerText = "Predicted AQI: " + data.Predicted_AQI;
+        const BACKEND_URL = "https://aqi-prediction-delhi.onrender.com";
+
+    // Wake up the backend as soon as the page loads
+    window.addEventListener("load", () => {
+        fetch(BACKEND_URL)
+            .then(() => console.log("Backend warmed up"))
+            .catch(error => console.log("Backend warm-up:", error));
+    });
+
+    document.getElementById("aqiForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const month = document.getElementById("month").value;
+        const year = document.getElementById("year").value;
+        const pm2_5 = document.getElementById("pm2_5").value;
+        const pm10 = document.getElementById("pm10").value;
+        const no2 = document.getElementById("no2").value;
+        const so2 = document.getElementById("so2").value;
+        const co = document.getElementById("co").value;
+        const ozone = document.getElementById("ozone").value;
+
+        fetch(BACKEND_URL + "/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                month: month,
+                year: year,
+                pm2_5: pm2_5,
+                pm10: pm10,
+                no2: no2,
+                so2: so2,
+                co: co,
+                ozone: ozone
             })
-            .catch(error => {
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("result").innerText =
+                "Predicted AQI: " + data.Predicted_AQI;
+        })
+        .catch(error => {
             console.error("Error:", error);
-            document.getElementById("result").innerText = "Something went wrong.";
-            });
+            document.getElementById("result").innerText =
+                "Something went wrong.";
         });
+    });
     </script>
     </body>
 </html>
