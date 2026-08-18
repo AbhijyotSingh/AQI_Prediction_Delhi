@@ -60,7 +60,7 @@ window.addEventListener("load", () => {
 
     document.getElementById("aqiForm").addEventListener("submit", function(event) {
         event.preventDefault();
-
+        document.getElementById("result").innerText = "Predicting... this may take up to a minute if the server was idle.";
         const month = document.getElementById("month").value;
         const year = document.getElementById("year").value;
         const pm2_5 = document.getElementById("pm2_5").value;
