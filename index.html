@@ -119,16 +119,29 @@ window.addEventListener("load", () => {
         .then(response => response.json())
 .then(data => {
     const predicted = data.Predicted_AQI;
+
     const actual = calculateActualAQI(
-        parseFloat(pm2_5), parseFloat(pm10), parseFloat(no2),
-        parseFloat(so2), parseFloat(co), parseFloat(ozone)
+        parseFloat(pm2_5),
+        parseFloat(pm10),
+        parseFloat(no2),
+        parseFloat(so2),
+        parseFloat(co),
+        parseFloat(ozone)
     );
-    const error = Math.abs(predicted - actual) / actual * 100;
+
+    let errorText;
+
+    if (actual === 0) {
+        errorText = "N/A (calculated AQI is 0)";
+    } else {
+        const error = Math.abs(predicted - actual) / actual * 100;
+        errorText = error.toFixed(2) + "%";
+    }
 
     document.getElementById("result").innerHTML =
         "Predicted AQI: " + predicted.toFixed(2) + "<br>" +
         "Calculated AQI: " + actual.toFixed(2) + "<br>" +
-        "Percentage Error: " + error.toFixed(2) + "%";
+        "Percentage Error: " + errorText;
 })
         .catch(error => {
             console.error("Error:", error);
