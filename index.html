@@ -40,12 +40,23 @@
     <script>
         const BACKEND_URL = "https://aqi-prediction-delhi.onrender.com";
 
-    // Wake up the backend as soon as the page loads
-    window.addEventListener("load", () => {
-        fetch(BACKEND_URL)
-            .then(() => console.log("Backend warmed up"))
-            .catch(error => console.log("Backend warm-up:", error));
-    });
+    // Wake up the backend as soon as the page loads and shows a notification
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+    Notification.requestPermission();
+}
+
+window.addEventListener("load", () => {
+    fetch(BACKEND_URL)
+        .then(() => {
+            console.log("Backend warmed up");
+            if (Notification.permission === "granted") {
+                new Notification("AQI Predictor is ready!", {
+                    body: "The backend has finished waking up — you can predict now."
+                });
+            }
+        })
+        .catch(error => console.log("Backend warm-up:", error));
+});
 
     document.getElementById("aqiForm").addEventListener("submit", function(event) {
         event.preventDefault();
