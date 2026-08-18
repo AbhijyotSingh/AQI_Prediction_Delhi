@@ -38,6 +38,36 @@
         </form>
         <div id="result"></div>
     <script>
+        function calculateSubIndex(conc, breakpoints) {
+    for (let [cLo, cHi, iLo, iHi] of breakpoints) {
+        if (conc >= cLo && conc <= cHi) {
+            return ((iHi - iLo) / (cHi - cLo)) * (conc - cLo) + iLo;
+        }
+    }
+    return null; // out of defined range
+}
+
+function calculateActualAQI(pm2_5, pm10, no2, so2, co, ozone) {
+    const breakpoints = {
+        pm2_5: [[0,30,0,50],[31,60,51,100],[61,90,101,200],[91,120,201,300],[121,250,301,400],[251,380,401,500]],
+        pm10:  [[0,50,0,50],[51,100,51,100],[101,250,101,200],[251,350,201,300],[351,430,301,400],[431,510,401,500]],
+        no2:   [[0,40,0,50],[41,80,51,100],[81,180,101,200],[181,280,201,300],[281,400,301,400],[401,500,401,500]],
+        so2:   [[0,40,0,50],[41,80,51,100],[81,380,101,200],[381,800,201,300],[801,1600,301,400],[1601,2100,401,500]],
+        co:    [[0,1,0,50],[1.1,2,51,100],[2.1,10,101,200],[10.1,17,201,300],[17.1,34,301,400],[34.1,50,401,500]],
+        ozone: [[0,50,0,50],[51,100,51,100],[101,168,101,200],[169,208,201,300],[209,748,301,400],[749,1000,401,500]]
+    };
+
+    const subIndices = [
+        calculateSubIndex(pm2_5, breakpoints.pm2_5),
+        calculateSubIndex(pm10, breakpoints.pm10),
+        calculateSubIndex(no2, breakpoints.no2),
+        calculateSubIndex(so2, breakpoints.so2),
+        calculateSubIndex(co, breakpoints.co),
+        calculateSubIndex(ozone, breakpoints.ozone)
+    ].filter(v => v !== null);
+
+    return Math.max(...subIndices);
+}
         const BACKEND_URL = "https://aqi-prediction-delhi.onrender.com";
 
     // Wake up the backend as soon as the page loads and shows a notification
@@ -87,10 +117,19 @@ window.addEventListener("load", () => {
             })
         })
         .then(response => response.json())
-        .then(data => {
-            document.getElementById("result").innerText =
-                "Predicted AQI: " + data.Predicted_AQI;
-        })
+.then(data => {
+    const predicted = data.Predicted_AQI;
+    const actual = calculateActualAQI(
+        parseFloat(pm2_5), parseFloat(pm10), parseFloat(no2),
+        parseFloat(so2), parseFloat(co), parseFloat(ozone)
+    );
+    const error = Math.abs(predicted - actual) / actual * 100;
+
+    document.getElementById("result").innerHTML =
+        "Predicted AQI: " + predicted.toFixed(2) + "<br>" +
+        "Calculated Actual AQI: " + actual.toFixed(2) + "<br>" +
+        "Percentage Error: " + error.toFixed(2) + "%";
+})
         .catch(error => {
             console.error("Error:", error);
             document.getElementById("result").innerText =
