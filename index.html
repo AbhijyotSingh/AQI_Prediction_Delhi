@@ -1,50 +1,92 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>
-            AQI Predictor
-        </title>
-        <link rel="stylesheet" href="css.css">
-    </head>
-    <body>
-        <h1>AQI Predictor</h1>
-        <h2>Predicting AQI through years of data</h2>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AQI Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
+    <main class="page">
+        <header class="intro">
+            <h1>AQI Predictor</h1>
+            <h2>Predicting AQI through years of data</h2>
+            <ul class="scale" aria-label="AQI categories">
+                <li class="s1"><b>Good</b> 0–50</li>
+                <li class="s2"><b>Satisfactory</b> 51–100</li>
+                <li class="s3"><b>Moderate</b> 101–200</li>
+                <li class="s4"><b>Poor</b> 201–300</li>
+                <li class="s5"><b>Very Poor</b> 301–400</li>
+                <li class="s6"><b>Severe</b> 401+</li>
+            </ul>
+        </header>
+
         <form id="aqiForm">
-            <label for="month">Enter month:</label>
-            <input type="number" id="month" placeholder="1-12" min="1" max="12" size="30">
-            <br>
-            <label for="year">Enter year:</label>
-            <input type="number" id="year" min="2000" max="2100" placeholder="2000-2100" size="30">
-            <br>
-            <label for="pm2_5">Enter particulate matter less than 2.5 micrometers (PM<sub>2.5</sub>) µg/m³:</label>
-            <input type="number" id="pm2_5" step="any" min="0" size="30">
-            <br>
-            <label for="pm10">Enter particulate matter less than 10 micrometers (PM<sub>10</sub>) µg/m³:</label>
-            <input type="number" id="pm10" step="any" min="0" size="30">
-            <br>
-            <label for="no2">Enter the quantity of Nitrogen Dioxide (NO<sub>2</sub>) µg/m³:</label>
-            <input type="number" id="no2" step="any" min="0" size="30">
-            <br>
-            <label for="so2">Enter the quantity of Sulphur Dioxide (SO<sub>2</sub>) µg/m³:</label>
-            <input type="number" id="so2" step="any" min="0" size="30">
-            <br>
-            <label for="co">Enter the quantity of Carbon Monoxide (CO) mg/m³:</label>
-            <input type="number" id="co" step="any" min="0" size="30">
-            <br>
-            <label for="ozone">Enter the quantity of grounded Ozone (O<sub>3</sub>) µg/m³:</label>
-            <input type="number" id="ozone" step="any" min="0" size="30">
-            <br>
-            <button type="submit">Predict AQI</button>
+            <fieldset class="group">
+                <legend>Period</legend>
+                <div class="grid two">
+                <div class="field">
+                    <label for="month">Enter month:</label>
+                    <input type="number" id="month" placeholder="1-12" min="1" max="12" required>
+                </div>
+                <div class="field">
+                    <label for="year">Enter year:</label>
+                    <input type="number" id="year" placeholder="2000-2100" min="2000" max="2100" required>
+                </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="group">
+                <legend>Pollutant readings</legend>
+                <div class="grid two">
+                <div class="field">
+                    <label for="pm2_5">Enter particulate matter less than 2.5 micrometers (PM<sub>2.5</sub>) µg/m³:</label>
+                    <input type="number" id="pm2_5" step="any" min="0" required>
+                </div>
+                <div class="field">
+                    <label for="pm10">Enter particulate matter less than 10 micrometers (PM<sub>10</sub>) µg/m³:</label>
+                    <input type="number" id="pm10" step="any" min="0" required>
+                </div>
+                <div class="field">
+                    <label for="no2">Enter the quantity of Nitrogen Dioxide (NO<sub>2</sub>) µg/m³:</label>
+                    <input type="number" id="no2" step="any" min="0" required>
+                </div>
+                <div class="field">
+                    <label for="so2">Enter the quantity of Sulphur Dioxide (SO<sub>2</sub>) µg/m³:</label>
+                    <input type="number" id="so2" step="any" min="0" required>
+                </div>
+                <div class="field">
+                    <label for="co">Enter the quantity of Carbon Monoxide (CO) mg/m³:</label>
+                    <input type="number" id="co" step="any" min="0" required>
+                </div>
+                <div class="field">
+                    <label for="ozone">Enter the quantity of grounded Ozone (O<sub>3</sub>) µg/m³:</label>
+                    <input type="number" id="ozone" step="any" min="0" required>
+                </div>
+                </div>
+            </fieldset>
+
+            <button type="submit" id="submitBtn">Predict AQI</button>
         </form>
-        <div id="result"></div>
-    <script>
-        function calculateSubIndex(conc, breakpoints) {
+        <div id="result" role="status" aria-live="polite"></div>
+    </main>
+
+<script>
+// Linear interpolation inside the matching breakpoint band.
+// Fixed: values that fall in the gaps between bands (e.g. 30.5) or above the
+// top band no longer return null; they use the next band / the top band.
+function calculateSubIndex(conc, breakpoints) {
+    if (isNaN(conc)) return null;
     for (let [cLo, cHi, iLo, iHi] of breakpoints) {
-        if (conc >= cLo && conc <= cHi) {
-            return ((iHi - iLo) / (cHi - cLo)) * (conc - cLo) + iLo;
+        if (conc <= cHi) {
+            const c = Math.max(conc, cLo);
+            return ((iHi - iLo) / (cHi - cLo)) * (c - cLo) + iLo;
         }
     }
-    return null; // out of defined range
+    return 500; // above the highest band
 }
 
 function calculateActualAQI(pm2_5, pm10, no2, so2, co, ozone) {
@@ -66,12 +108,26 @@ function calculateActualAQI(pm2_5, pm10, no2, so2, co, ozone) {
         calculateSubIndex(ozone, breakpoints.ozone)
     ].filter(v => v !== null);
 
-    return Math.max(...subIndices);
+    return subIndices.length ? Math.max(...subIndices) : null;
 }
-        const BACKEND_URL = "https://aqi-prediction-delhi.onrender.com";
 
-    // Wake up the backend as soon as the page loads and shows a notification
-    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+// Indian National AQI categories
+function aqiCategory(aqi) {
+    if (aqi <= 50)  return { label: "Good",         color: "#7bd37b" };
+    if (aqi <= 100) return { label: "Satisfactory", color: "#c5e17a" };
+    if (aqi <= 200) return { label: "Moderate",     color: "#ffe066" };
+    if (aqi <= 300) return { label: "Poor",         color: "#ffb347" };
+    if (aqi <= 400) return { label: "Very Poor",    color: "#ff7b6b" };
+    return                 { label: "Severe",       color: "#d98cc0" };
+}
+
+const BACKEND_URL = "https://aqi-prediction-delhi.onrender.com";
+const resultEl = document.getElementById("result");
+const submitBtn = document.getElementById("submitBtn");
+
+// Wake up the backend as soon as the page loads and shows a notification
+const canNotify = "Notification" in window;
+if (canNotify && Notification.permission !== "granted" && Notification.permission !== "denied") {
     Notification.requestPermission();
 }
 
@@ -79,7 +135,7 @@ window.addEventListener("load", () => {
     fetch(BACKEND_URL)
         .then(() => {
             console.log("Backend warmed up");
-            if (Notification.permission === "granted") {
+            if (canNotify && Notification.permission === "granted") {
                 new Notification("AQI Predictor is ready!", {
                     body: "The backend has finished waking up — you can predict now."
                 });
@@ -88,67 +144,68 @@ window.addEventListener("load", () => {
         .catch(error => console.log("Backend warm-up:", error));
 });
 
-    document.getElementById("aqiForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        document.getElementById("result").innerText = "Predicting... this may take up to a minute if the server was idle.";
-        const month = document.getElementById("month").value;
-        const year = document.getElementById("year").value;
-        const pm2_5 = document.getElementById("pm2_5").value;
-        const pm10 = document.getElementById("pm10").value;
-        const no2 = document.getElementById("no2").value;
-        const so2 = document.getElementById("so2").value;
-        const co = document.getElementById("co").value;
-        const ozone = document.getElementById("ozone").value;
+document.getElementById("aqiForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    resultEl.className = "";
+    resultEl.innerText = "Predicting... this may take up to a minute if the server was idle.";
+    submitBtn.disabled = true;
 
-        fetch(BACKEND_URL + "/predict", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                month: month,
-                year: year,
-                pm2_5: pm2_5,
-                pm10: pm10,
-                no2: no2,
-                so2: so2,
-                co: co,
-                ozone: ozone
-            })
-        })
-        .then(response => response.json())
-.then(data => {
-    const predicted = data.Predicted_AQI;
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+    const pm2_5 = document.getElementById("pm2_5").value;
+    const pm10 = document.getElementById("pm10").value;
+    const no2 = document.getElementById("no2").value;
+    const so2 = document.getElementById("so2").value;
+    const co = document.getElementById("co").value;
+    const ozone = document.getElementById("ozone").value;
 
-    const actual = calculateActualAQI(
-        parseFloat(pm2_5),
-        parseFloat(pm10),
-        parseFloat(no2),
-        parseFloat(so2),
-        parseFloat(co),
-        parseFloat(ozone)
-    );
+    fetch(BACKEND_URL + "/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ month, year, pm2_5, pm10, no2, so2, co, ozone })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Server responded with status " + response.status);
+        return response.json();
+    })
+    .then(data => {
+        const predicted = Number(data.Predicted_AQI);
+        if (!isFinite(predicted)) throw new Error("Invalid prediction received");
 
-    let errorText;
+        const actual = calculateActualAQI(
+            parseFloat(pm2_5), parseFloat(pm10), parseFloat(no2),
+            parseFloat(so2), parseFloat(co), parseFloat(ozone)
+        );
 
-    if (actual === 0) {
-        errorText = "N/A (calculated AQI is 0)";
-    } else {
-        const error = Math.abs(predicted - actual) / actual * 100;
-        errorText = error.toFixed(2) + "%";
-    }
+        let errorText;
+        let actualText;
+        if (actual === null) {
+            actualText = "N/A";
+            errorText = "N/A (could not calculate AQI)";
+        } else {
+            actualText = actual.toFixed(2);
+            errorText = actual === 0
+                ? "N/A (calculated AQI is 0)"
+                : (Math.abs(predicted - actual) / actual * 100).toFixed(2) + "%";
+        }
 
-    document.getElementById("result").innerHTML =
-        "Predicted AQI: " + predicted.toFixed(2) + "<br>" +
-        "Calculated AQI: " + actual.toFixed(2) + "<br>" +
-        "Percentage Error: " + errorText;
-})
-        .catch(error => {
-            console.error("Error:", error);
-            document.getElementById("result").innerText =
-                "Something went wrong.";
-        });
+        const cat = aqiCategory(predicted);
+        resultEl.style.borderLeftColor = cat.color;
+        resultEl.innerHTML =
+            "Predicted AQI: " + predicted.toFixed(2) + "<br>" +
+            "Calculated AQI: " + actualText + "<br>" +
+            "Percentage Error: " + errorText + "<br>" +
+            '<span class="category" style="background:' + cat.color + '">' + cat.label + "</span>";
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        resultEl.className = "error";
+        resultEl.innerText = "Something went wrong. Check your values and try again in a moment.";
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
     });
-    </script>
-    </body>
+});
+</script>
+</body>
 </html>
